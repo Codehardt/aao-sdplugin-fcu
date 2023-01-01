@@ -121,46 +121,19 @@ Dieser Code muss nach z.B. dem `Rotary Encoder` Eintrag hinzugefügt werden, das
 
 Damit die ganze FCU Implementierung von dem Plugin geladen wird, muss eine Zeile in der `code.html` hinzugefügt werden:
 
-```html
-<script src="js/fcu.js"></script>
-```
-
-Wichtig ist, dass diese Zeile auf jeden Fall irgendwo vor der Zeile
-
-```html
-<script src="js/aaoDeck.js"></script>
-```
-
-hinzugefügt wird, ansonsten kommt es zu Fehlern.
-
-Insgesamt könnte das dann in etwa so aussehen _(nicht alles kopieren, da es nach einem Update anders aussehen könnte)_:
-
-```html
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>com.lorby-si.aao</title>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="lorbyaoopluginstyles.css" />
-    <script src="settings.js"></script>
-    <script src="js/timer.js"></script>
-    <script src="js/connectionAction.js"></script>
-    <script src="js/toggleAction.js"></script>
-    <script src="js/onOffAction.js"></script>
-    <script src="js/buttonAction.js"></script>
-    <script src="js/eventAction.js"></script>
-    <script src="js/dualEventAction.js"></script>
-    <script src="js/textGaugeAction.js"></script>
-    <script src="js/steamGaugeAction.js"></script>
-    <script src="js/sliderGaugeAction.js"></script>
-    <script src="js/multiGaugeAction.js"></script>
-    <script src="js/multiTileGaugeAction.js"></script>
-    <script src="js/rotaryEncoderAction.js"></script>
-    <script src="js/fcu.js"></script>
-    <script src="js/aaoDeck.js"></script>
-    <script src="js/main.js"></script>
-  </head>
-</html>
+```diff
+@@ -15,10 +15,11 @@
+         <script src="js/textGaugeAction.js"></script>
+         <script src="js/steamGaugeAction.js"></script>
+         <script src="js/sliderGaugeAction.js"></script>
+         <script src="js/multiGaugeAction.js"></script>
+         <script src="js/multiTileGaugeAction.js"></script>
+         <script src="js/rotaryEncoderAction.js"></script>
++        <script src="js/fcu.js"></script>
+         <script src="js/aaoDeck.js"></script>
+         <script src="js/main.js"></script>
+     </head>
+ </html>
 ```
 
 ## AAO Plugin patchen
