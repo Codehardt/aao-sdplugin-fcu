@@ -3,7 +3,7 @@ Patch for Lorby SI AAO Plugin for Elgato Stream Deck to support FCU
 
 ## Manifest
 
-In der `manifest.json` Datei müssen die vier FCU Bildschirme hinzugefügt werden, damit sie in den StreamDeck Einstellungen den Bildschirmen zugewiesen werden können:
+The `manifest.json` has to be patched as follows to be able to map the FCU to the four displays of the Stream Deck:
 
 ```diff
 @@ -172,12 +172,80 @@
@@ -89,9 +89,9 @@ In der `manifest.json` Datei müssen die vier FCU Bildschirme hinzugefügt werde
          "LorbyAxisAndOhs_MSFS.exe",
 ```
 
-## FCU Code importieren
+## Entry Point
 
-Damit die ganze FCU Implementierung von dem Plugin geladen wird, muss eine Zeile in der `code.html` hinzugefügt werden:
+The entry point `code.html` has to be patched as follows to import our custom code to the plugin:
 
 ```diff
 @@ -15,10 +15,11 @@
@@ -108,9 +108,9 @@ Damit die ganze FCU Implementierung von dem Plugin geladen wird, muss eine Zeile
  </html>
 ```
 
-## AAO Plugin patchen
+## AAO Deck
 
-Damit das FCU korrekt funktioniert, müssen einige Kleinigkeiten an der `js/aaoDeck.js` Datei geändert werden:
+The `js/aaoDeck.js` file has to be patched as follows to initialize and call our custom fcu stuff:
 
 ```diff
 @@ -75,17 +75,17 @@
@@ -170,6 +170,6 @@ Damit das FCU korrekt funktioniert, müssen einige Kleinigkeiten an der `js/aaoD
        connState = false;
 ```
 
-## FCU Implementierung
+## FCU Implementation
 
-Zum Schluss muss natürlich noch die `js/fcu.js` Datei in den `js` Ordner des Plugins gelegt werden.
+You have to put the `js/fcu.js` file in this project to the `js` directory of the AAO plugin
