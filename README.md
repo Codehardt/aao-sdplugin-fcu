@@ -113,9 +113,7 @@ The entry point `code.html` has to be patched as follows to import our custom co
 The `js/aaoDeck.js` file has to be patched as follows to initialize and call our custom fcu stuff:
 
 ```diff
-@@ -75,17 +75,17 @@
-       event === "keyDown" ||
-       (event === "dialPress" && jsonPayload["pressed"] == true)
+@@ -77,13 +77,13 @@
      ) {
        // console.info("keyDown");
 
@@ -130,11 +128,7 @@ The `js/aaoDeck.js` file has to be patched as follows to initialize and call our
                settings["longclicktimeout"] &&
                settings["longclicktimeout"] !== "0"
              ) {
-               longclickTimout = parseInt(settings["longclicktimeout"]);
-             } else {
-@@ -252,16 +252,17 @@
-           canvas.height = 144;
-           actions[context] = new RotaryEncoderAction(
+@@ -254,12 +254,13 @@
              context,
              settings,
              coordinates,
@@ -148,11 +142,7 @@ The `js/aaoDeck.js` file has to be patched as follows to initialize and call our
              var getvar = { var: gsimvars[i], value: 0.0 };
              AddVar(getvar);
              if (!bulkInitScript.includes(gsimvars[i]))
-               bulkInitScript = bulkInitScript + gsimvars[i] + " ";
-           }
-@@ -665,16 +666,17 @@
-             ) {
-               settings["cursimval"] = simVal;
+@@ -667,12 +668,13 @@
                requestSettings(ctx);
              }
            }
@@ -166,8 +156,6 @@ The `js/aaoDeck.js` file has to be patched as follows to initialize and call our
      // writeToLog("DataLoop error, loop terminated");
      // console.log("DataLoop error, loop terminated");
      if (connActCtx) {
-       setState(connActCtx, 0);
-       connState = false;
 ```
 
 ## FCU Implementation
