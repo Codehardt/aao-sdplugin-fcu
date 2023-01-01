@@ -168,9 +168,6 @@ Insgesamt könnte das dann in etwa so aussehen _(nicht alles kopieren, da es nac
 Damit das FCU korrekt funktioniert, müssen einige Kleinigkeiten an der `js/aaoDeck.js` Datei geändert werden:
 
 ```diff
-ao.sdPlugin_20221231/com.lorbysi.aao.sdPlugin/js/aaoDeck.js
---- com.lorbysi.aao.sdPlugin/js/aaoDeck.js      2023-01-01 17:54:43.176156100 +0100
-+++ com.lorbysi.aao.sdPlugin_20221231/com.lorbysi.aao.sdPlugin/js/aaoDeck.js    2023-01-01 17:54:43.276678600 +0100
 @@ -75,17 +75,17 @@
        event === "keyDown" ||
        (event === "dialPress" && jsonPayload["pressed"] == true)
