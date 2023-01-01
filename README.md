@@ -5,7 +5,7 @@
 # aao-sdplugin-fcu
 Patch for Lorby SI AAO Plugin for Elgato Stream Deck to support FCU
 
-## Manifest
+## `manifest.json`
 
 The `manifest.json` has to be patched as follows to be able to map the FCU to the four displays of the Stream Deck:
 
@@ -93,7 +93,7 @@ The `manifest.json` has to be patched as follows to be able to map the FCU to th
          "LorbyAxisAndOhs_MSFS.exe",
 ```
 
-## Entry Point
+## `code.html`
 
 The entry point `code.html` has to be patched as follows to import our custom code to the plugin:
 
@@ -112,7 +112,7 @@ The entry point `code.html` has to be patched as follows to import our custom co
  </html>
 ```
 
-## AAO Deck
+## `js/aaoDeck.js`
 
 The `js/aaoDeck.js` file has to be patched as follows to initialize and call our custom fcu stuff:
 
@@ -162,6 +162,6 @@ The `js/aaoDeck.js` file has to be patched as follows to initialize and call our
      if (connActCtx) {
 ```
 
-## FCU Implementation
+## `js/fcu.js`
 
 You have to put the `js/fcu.js` file in this project to the `js` directory of the AAO plugin
