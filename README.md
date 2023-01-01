@@ -5,116 +5,88 @@ Patch for Lorby SI AAO Plugin for Elgato Stream Deck to support FCU
 
 In der `manifest.json` Datei müssen die vier FCU Bildschirme hinzugefügt werden, damit sie in den StreamDeck Einstellungen den Bildschirmen zugewiesen werden können:
 
-```json
-{
-    "Icon": "images/Lorby_Standard_rotate_trans",
-    "Name": "FCU 1",
-    "Controllers": ["Encoder"],
-    "Encoder": {
-        "layout": "$A0"
-    },
-    "States": [
-        {
-            "Image": "images/blank"
+```diff
+@@ -172,12 +172,80 @@
+                        }
+                ],
+                "UUID": "com.lorby-si.aao.rotary",
+                "VisibleInActionsList": true,
+                "UserTitleEnabled" : true,
+                "SupportedInMultiActions": true
++       },
++       {
++               "Icon": "images/Lorby_Standard_rotate_trans",
++               "Name": "FCU 1",
++               "Controllers": ["Encoder"],
++               "Encoder": {
++                       "layout": "$A0"
++               },
++               "States": [
++                       {
++                               "Image": "images/blank"
++                       }
++               ],
++               "UUID": "de.codehardt.fcu1",
++               "VisibleInActionsList": true,
++               "UserTitleEnabled" : true,
++               "SupportedInMultiActions": true
++       },
++       {
++               "Icon": "images/Lorby_Standard_rotate_trans",
++               "Name": "FCU 2",
++               "Controllers": ["Encoder"],
++               "Encoder": {
++                       "layout": "$A0"
++               },
++               "States": [
++                       {
++                               "Image": "images/blank"
++                       }
++               ],
++               "UUID": "de.codehardt.fcu2",
++               "VisibleInActionsList": true,
++               "UserTitleEnabled" : true,
++               "SupportedInMultiActions": true
++       },
++       {
++               "Icon": "images/Lorby_Standard_rotate_trans",
++               "Name": "FCU 3",
++               "Controllers": ["Encoder"],
++               "Encoder": {
++                       "layout": "$A0"
++               },
++               "States": [
++                       {
++                               "Image": "images/blank"
++                       }
++               ],
++               "UUID": "de.codehardt.fcu3",
++               "VisibleInActionsList": true,
++               "UserTitleEnabled" : true,
++               "SupportedInMultiActions": true
++       },
++       {
++               "Icon": "images/Lorby_Standard_rotate_trans",
++               "Name": "FCU 4",
++               "Controllers": ["Encoder"],
++               "Encoder": {
++                       "layout": "$A0"
++               },
++               "States": [
++                       {
++                               "Image": "images/blank"
++                       }
++               ],
++               "UUID": "de.codehardt.fcu4",
++               "VisibleInActionsList": true,
++               "UserTitleEnabled" : true,
++               "SupportedInMultiActions": true
         }
-    ],
-    "UUID": "de.codehardt.fcu1",
-    "VisibleInActionsList": true,
-    "UserTitleEnabled" : true,
-    "SupportedInMultiActions": true
-},
-{
-    "Icon": "images/Lorby_Standard_rotate_trans",
-    "Name": "FCU 2",
-    "Controllers": ["Encoder"],
-    "Encoder": {
-        "layout": "$A0"
-    },
-    "States": [
-        {
-            "Image": "images/blank"
-        }
-    ],
-    "UUID": "de.codehardt.fcu2",
-    "VisibleInActionsList": true,
-    "UserTitleEnabled" : true,
-    "SupportedInMultiActions": true
-},
-{
-    "Icon": "images/Lorby_Standard_rotate_trans",
-    "Name": "FCU 3",
-    "Controllers": ["Encoder"],
-    "Encoder": {
-        "layout": "$A0"
-    },
-    "States": [
-        {
-            "Image": "images/blank"
-        }
-    ],
-    "UUID": "de.codehardt.fcu3",
-    "VisibleInActionsList": true,
-    "UserTitleEnabled" : true,
-    "SupportedInMultiActions": true
-},
-{
-    "Icon": "images/Lorby_Standard_rotate_trans",
-    "Name": "FCU 4",
-    "Controllers": ["Encoder"],
-    "Encoder": {
-        "layout": "$A0"
-    },
-    "States": [
-        {
-            "Image": "images/blank"
-        }
-    ],
-    "UUID": "de.codehardt.fcu4",
-    "VisibleInActionsList": true,
-    "UserTitleEnabled" : true,
-    "SupportedInMultiActions": true
-}
-```
-
-Dieser Code muss nach z.B. dem `Rotary Encoder` Eintrag hinzugefügt werden, das sieht dann in etwa so aus:
-
-```json
-// ...
-{
-    "Icon": "images/Lorby_Standard_rotate_trans",
-    "Name": "Rotary Encoder",
-    "Controllers": ["Encoder"],
-    "Encoder": {
-        "layout": "$B1"
-    },
-    "States": [
-        {
-            "Image": "images/blank"
-        }
-    ],
-    "UUID": "com.lorby-si.aao.rotary",
-    "VisibleInActionsList": true,
-    "UserTitleEnabled" : true,
-    "SupportedInMultiActions": true
-},
-{
-    "Icon": "images/Lorby_Standard_rotate_trans",
-    "Name": "FCU 1",
-    "Controllers": ["Encoder"],
-    "Encoder": {
-        "layout": "$A0"
-    },
-    "States": [
-        {
-            "Image": "images/blank"
-        }
-    ],
-    "UUID": "de.codehardt.fcu1",
-    "VisibleInActionsList": true,
-    "UserTitleEnabled" : true,
-    "SupportedInMultiActions": true
-},
-// ... hier folgen FCU 2, FCU 3 und FCU 4
+   ],
+   "ApplicationsToMonitor": {
+     "windows": [
+         "LorbyAxisAndOhs.exe",
+         "LorbyAxisAndOhs_MSFS.exe",
 ```
 
 ## FCU Code importieren
