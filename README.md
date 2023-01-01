@@ -165,144 +165,67 @@ Insgesamt könnte das dann in etwa so aussehen _(nicht alles kopieren, da es nac
 
 ## AAO Plugin patchen
 
-Damit das FCU korrekt funktioniert, müssen einige Kleinigkeiten an der `js/aaoDeck.js` Datei geändert werden.
+Damit das FCU korrekt funktioniert, müssen einige Kleinigkeiten an der `js/aaoDeck.js` Datei geändert werden:
 
-### FCU Generator initialisieren
+```diff
+ao.sdPlugin_20221231/com.lorbysi.aao.sdPlugin/js/aaoDeck.js
+--- com.lorbysi.aao.sdPlugin/js/aaoDeck.js      2023-01-01 17:54:43.176156100 +0100
++++ com.lorbysi.aao.sdPlugin_20221231/com.lorbysi.aao.sdPlugin/js/aaoDeck.js    2023-01-01 17:54:43.276678600 +0100
+@@ -75,17 +75,17 @@
+       event === "keyDown" ||
+       (event === "dialPress" && jsonPayload["pressed"] == true)
+     ) {
+       // console.info("keyDown");
 
-An der Stelle, wo im Plugin die ganzen Aktionen initialisiert werden, muss auch die FCU initialisiert werden.
+       // Send onKeyDown event to actions
+       if (context in actions) {
+         if (actions[context].onKeyDown) {
+-          if (settings["longsimevt"]) {
++          if (settings["longsimevt"] || actions[context].hasLongSimEvt?.()) {
+             longclickarmed = true;
+             lccontext = context;
+             if (
+               settings["longclicktimeout"] &&
+               settings["longclicktimeout"] !== "0"
+             ) {
+               longclickTimout = parseInt(settings["longclicktimeout"]);
+             } else {
+@@ -252,16 +252,17 @@
+           canvas.height = 144;
+           actions[context] = new RotaryEncoderAction(
+             context,
+             settings,
+             coordinates,
+             canvas
+           );
+         }
++        fcuWillAppear(actions, action, context, settings, coordinates);
+         if (actions[context]) {
+           var gsimvars = actions[context].getSimVars();
+           for (let i = 0; i < gsimvars.length; i++) {
+             var getvar = { var: gsimvars[i], value: 0.0 };
+             AddVar(getvar);
+             if (!bulkInitScript.includes(gsimvars[i]))
+               bulkInitScript = bulkInitScript + gsimvars[i] + " ";
+           }
+@@ -665,16 +666,17 @@
+             ) {
+               settings["cursimval"] = simVal;
+               requestSettings(ctx);
+             }
+           }
+         }
+       }
+     }
++    RenderFCU(simvars, websocket);
+   }
 
-Dazu muss folgende Zeile in den Code hinzugefügt werden:
-
-```js
-fcuWillAppear(actions, action, context, settings, coordinates);
-```
-
-Diese Zeile müsste hinzugefügt werden vor dem folgenden bereits existierenden Code-Block:
-
-```js
-if (actions[context]) {
-  var gsimvars = actions[context].getSimVars();
-  for (let i = 0; i < gsimvars.length; i++) {
-    var getvar = { var: gsimvars[i], value: 0.0 };
-    AddVar(getvar);
-    if (!bulkInitScript.includes(gsimvars[i]))
-      bulkInitScript = bulkInitScript + gsimvars[i] + " ";
-  }
-}
-```
-
-Es kann natürlich sein, dass dieser durch ein Update ein klein bisschen anders aussieht.
-
-Insgesamt müsste der Abschnitt dann in etwa so aussehen:
-
-```js
-else if (action === ('com.lorby-si.aao.multitilegauge')) {
-    var canvas = document.createElement('canvas');
-    canvas.width = 144;
-    canvas.height = 144;
-    actions[context] = new MultiTileGaugeAction(context, settings, coordinates, canvas);
-}
-else if (action === ('com.lorby-si.aao.rotary')) {
-    var canvas = document.createElement('canvas');
-    canvas.width = 144;
-    canvas.height = 144;
-    actions[context] = new RotaryEncoderAction(context, settings, coordinates, canvas);
-}
-fcuWillAppear(actions, action, context, settings, coordinates);
-if (actions[context]){
-    var gsimvars = actions[context].getSimVars();
-    for (let i = 0; i < gsimvars.length; i++){
-        var getvar = {"var":gsimvars[i],"value":0.0};
-        AddVar(getvar);
-    if (!bulkInitScript.includes(gsimvars[i]))
-        bulkInitScript = bulkInitScript + gsimvars[i] + ' ';
-    }
-}
-settings["statectr"] =0;
-saveSettings(action, context, settings);
-```
-
-### FCU Zeichner ausführen
-
-Folgende Zeile muss hinzugefügt werden, damit die FCU Bilder generiert und an den StreamDeck geschickt werden:
-
-```js
-RenderFCU(simvars, websocket);
-```
-
-Diese Zeile muss ganz an das Ende von der `dataRequestListener` Funktion hinzugefügt werden, insgesamt sieht das dann in etwa so aus:
-
-```js
-  function dataRequestListener() {
-    // ...
-        if (act.drawButton) {
-          if (act.drawButton()) {
-            setPicture(ctx, act.getImageData(), act.getCoords());
-          }
-        } else {
-          if (act.drawIcon) {
-            let iconOut = act.drawIcon(simvars, simstringvars);
-            let valueOut = act.getStripValue();
-            let indicatorOut = act.getIndicator();
-            if (iconOut || valueOut || indicatorOut) {
-              setFeedback(
-                ctx,
-                iconOut,
-                act.getImageData(),
-                valueOut,
-                act.getStripValueString(),
-                indicatorOut,
-                act.getIndicatorValue()
-              );
-            }
-          } else {
-            if (
-              lastVal != simVal ||
-              altlastVal != altsimVal ||
-              altTwolastVal != altTwosimVal ||
-              onlastVal != onsimVal
-            ) {
-              settings["cursimval"] = simVal;
-              requestSettings(ctx);
-            }
-          }
-        }
-      }
-    }
-    RenderFCU(simvars, websocket);
-  }
-
-  function dataRequestError() {
-    // ...
-  }
-```
-
-### FCU Langer Knopfdruck reparieren
-
-Folgende Änderung ist notwendig, damit das lange Drücken eines Knopfes in der FCU funktioniert:
-
-**Vorher:**
-
-```js
-      // Send onKeyDown event to actions
-      if (context in actions) {
-        if (actions[context].onKeyDown) {
-          if (settings["longsimevt"]) {
-            longclickarmed = true;
-            lccontext = context;
-            // ...
-```
-
-**Nachher:**
-
-```js
-      // Send onKeyDown event to actions
-      if (context in actions) {
-        if (actions[context].onKeyDown) {
-          if (settings["longsimevt"] || actions[context].hasLongSimEvt?.()) {
-            longclickarmed = true;
-            lccontext = context;
-            // ...
+   function dataRequestError() {
+     // writeToLog("DataLoop error, loop terminated");
+     // console.log("DataLoop error, loop terminated");
+     if (connActCtx) {
+       setState(connActCtx, 0);
+       connState = false;
 ```
 
 ## FCU Implementierung
