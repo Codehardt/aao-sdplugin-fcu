@@ -1,5 +1,7 @@
 ![fcu](https://github.com/Codehardt/aao-sdplugin-fcu/blob/main/fcu.png?raw=true)
 
+![fcu](https://github.com/Codehardt/aao-sdplugin-fcu/blob/main/fcu2.png?raw=true)
+
 # aao-sdplugin-fcu
 Patch for Lorby SI AAO Plugin for Elgato Stream Deck to support FCU
 
