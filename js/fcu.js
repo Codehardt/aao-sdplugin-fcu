@@ -1,7 +1,9 @@
 // fcuContext contains the four contexts that are used
 // to identify the four slots of the StreamDeck+ feedback display
 // and their corresponding buttons
-const fcuActions = null;
+let fcuActions = null;
+let fcuWebsocket = null;
+let fcuWebsocketPrev = null;
 const fcuContext = [null, null, null, null];
 
 // fcuCache contains all values that are relevant for the fcu, e.g.
@@ -40,30 +42,44 @@ const FCUVAR = {
 // should be rerendered (sent to StreamDeck+)
 const lastFCUImages = [null, null, null, null];
 
+function resetImages() {
+  lastFCUImages.forEach((_, i) => (lastFCUImages[i] = null));
+}
+
 // RenderFCU converts the simvars from AAO to 4 200x100 png images to be rendered
 // by the StreamDeck+ feedback display.
 function RenderFCU(simvars, websocket) {
+  if (websocket) {
+    fcuWebsocket = websocket;
+  }
+  if (fcuWebsocket !== fcuWebsocketPrev) {
+    fcuWebsocketPrev = fcuWebsocket;
+    resetImages();
+  }
   // apply all new sim vars to current fcu cache
   Object.values(FCUVAR).forEach((fcuvar) => {
-    const newValue = simvars[fcuvar];
+    const newValue = simvars?.[fcuvar];
     if (newValue != null) fcuCache.set(fcuvar, newValue);
   });
   // check if we have access to all four StreamDeck+ feedback displays
-  if (!streamDeckReadyForFCU()) return;
+  if (!streamDeckReadyForFCU()) {
+    resetImages();
+    return;
+  }
   // build all 4 fcu image slots based on the fcu variables in fcu cache
   const images = buildFCUImages({
     spd: fcuCache.get(FCUVAR.SPDDASH)
       ? null
-      : fcuCache.get(FCUVAR.SPDDOT)
-      ? fcuCache.get(FCUVAR.SPDSELECTED) ?? 0
-      : fcuCache.get(FCUVAR.SPD) ?? 0,
+      : fcuCache.get(FCUVAR.SPDSELECTED) === -1
+      ? fcuCache.get(FCUVAR.SPD) ?? 0
+      : fcuCache.get(FCUVAR.SPDSELECTED) ?? 0,
     spdDot: fcuCache.get(FCUVAR.SPDDOT) ?? false,
     mach: fcuCache.get(FCUVAR.SPDDASH) ? null : fcuCache.get(FCUVAR.MACH) ?? 0,
     hdg: fcuCache.get(FCUVAR.HDGDASH)
       ? null
-      : fcuCache.get(FCUVAR.HDGDOT)
-      ? fcuCache.get(FCUVAR.HDGSELECTED) ?? 0
-      : fcuCache.get(FCUVAR.HDG) ?? 0,
+      : fcuCache.get(FCUVAR.HDGSELECTED) === -1
+      ? fcuCache.get(FCUVAR.HDG) ?? 0
+      : fcuCache.get(FCUVAR.HDGSELECTED) ?? 0,
     hdgDot: fcuCache.get(FCUVAR.HDGDOT) ?? false,
     alt: fcuCache.get(FCUVAR.ALT) ?? 0,
     altDot: fcuCache.get(FCUVAR.ALTDOT) ?? false,
@@ -78,7 +94,7 @@ function RenderFCU(simvars, websocket) {
       // image has not changed since last iteration, skip to improve performance
       return;
     }
-    setFullFeedback(websocket, fcuContext[i], image);
+    setFullFeedback(fcuContext[i], image);
     lastFCUImages[i] = image;
   });
 }
@@ -88,7 +104,7 @@ function streamDeckReadyForFCU() {
   if (
     fcuContext.find(
       (context) =>
-        !fcuActions || !context || !Object.hasProperty(fcuActions, context)
+        !fcuActions || !context || !fcuActions.hasOwnProperty(context)
     )
   ) {
     return false;
@@ -261,6 +277,15 @@ function buildFCUImages({
   return canvas.map((canvas) => canvas.toDataURL());
 }
 
+function runFCUAction(reqObj) {
+  const xhttp = new XMLHttpRequest();
+  xhttp.open(
+    "GET",
+    AAO_URL + "?json=" + encodeURIComponent(JSON.stringify(reqObj))
+  );
+  xhttp.send();
+}
+
 // FCUAction handles rotation and key events and converts
 // them to AAO triggers
 function FCUAction(inContext, inSettings, coordinates, action) {
@@ -290,9 +315,7 @@ function FCUAction(inContext, inSettings, coordinates, action) {
         value: "1",
       });
     }
-    fetch(
-      AAO_URL + "?json=" + encodeURIComponent(JSON.stringify({ triggers }))
-    );
+    runFCUAction({ triggers });
   };
   this.onKeyUp = function () {};
   this.onDialRotate = function (inContext, inSettings, ticks) {
@@ -318,17 +341,32 @@ function FCUAction(inContext, inSettings, coordinates, action) {
         value: "0",
       });
     }
-    fetch(
-      AAO_URL + "?json=" + encodeURIComponent(JSON.stringify({ triggers }))
-    );
+    runFCUAction({ triggers });
   };
   this.onTouchTap = function () {
     const setvars = [];
-    setvars.push({
-      var: `(>L:A32NX_TRK_FPA_MODE_ACTIVE, Number)`,
-      value: fcuCache.get(FCUVAR.TRKMODE) ? "0" : "1",
-    });
-    fetch(AAO_URL + "?json=" + encodeURIComponent(JSON.stringify({ setvars })));
+    if (action === "de.codehardt.fcu1") {
+      setvars.push({
+        var: `(>H:A320_Neo_FCU_SPEED_TOGGLE_SPEED_MACH, Number)`,
+        value: "1",
+      });
+    } else if (action === "de.codehardt.fcu2") {
+      setvars.push({
+        var: `(>L:A32NX_TRK_FPA_MODE_ACTIVE, Number)`,
+        value: fcuCache.get(FCUVAR.TRKMODE) ? "0" : "1",
+      });
+    } else if (action === "de.codehardt.fcu3") {
+      setvars.push({
+        var: `(>L:A32NX_TRK_FPA_MODE_ACTIVE, Number)`,
+        value: fcuCache.get(FCUVAR.TRKMODE) ? "0" : "1",
+      });
+    } else if (action === "de.codehardt.fcu4") {
+      setvars.push({
+        var: `(>L:A32NX_TRK_FPA_MODE_ACTIVE, Number)`,
+        value: fcuCache.get(FCUVAR.TRKMODE) ? "0" : "1",
+      });
+    }
+    runFCUAction({ setvars });
   };
   this.onLongClick = function () {
     const triggers = [];
@@ -348,9 +386,7 @@ function FCUAction(inContext, inSettings, coordinates, action) {
         value: "1",
       });
     }
-    fetch(
-      AAO_URL + "?json=" + encodeURIComponent(JSON.stringify({ triggers }))
-    );
+    runFCUAction({ triggers });
   };
   this.getSimVars = function () {
     return Object.values(FCUVAR);
@@ -378,7 +414,7 @@ function addLetterSpacing(str) {
 }
 
 // setFullFeedback sends an 200x100 image to one of the 4 slots of the StreamDeck+ feedback display
-function setFullFeedback(websocket, inContext, img) {
+function setFullFeedback(inContext, img) {
   const json = {
     event: "setFeedback",
     context: inContext,
@@ -387,7 +423,7 @@ function setFullFeedback(websocket, inContext, img) {
       title: "",
     },
   };
-  websocket.send(JSON.stringify(json));
+  fcuWebsocket?.send(JSON.stringify(json));
 }
 
 function fcuWillAppear(actions, action, context, settings, coordinates) {
@@ -405,4 +441,5 @@ function fcuWillAppear(actions, action, context, settings, coordinates) {
     fcuContext[3] = context;
     actions[context] = new FCUAction(context, settings, coordinates, action);
   }
+  RenderFCU();
 }
