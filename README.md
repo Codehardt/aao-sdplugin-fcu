@@ -1,3 +1,5 @@
+**Note:** This repository is deprecated because the SD Plugin Version > 15.x supports the FCU natively with `Rotary Encoder Canvas`.
+
 ![fcu](https://github.com/Codehardt/aao-sdplugin-fcu/blob/main/fcu.png?raw=true)
 
 ![fcu](https://github.com/Codehardt/aao-sdplugin-fcu/blob/main/fcu2.png?raw=true)
